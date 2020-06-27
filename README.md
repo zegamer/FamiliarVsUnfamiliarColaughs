@@ -1,1 +1,3 @@
-# FamiliarVsUnfamiliar_colaugh
+# Familiar VS unfamiliar co-laughs
+
+How do simultaneous laughter vary between familiar and unfamiliar participants
