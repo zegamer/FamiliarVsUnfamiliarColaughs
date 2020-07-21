@@ -32,7 +32,7 @@ $ pip install -r requirements.txt
 #### Running the program
 The program needs to be run in separate parts.
 
-Once the database is set up as in the example folder, run wav_splitter.py.
+Once the database is set up as in the example folder, run wav_splitter.py. This will require reader.csv (see the example reader.csv file)
 ```sh
 $ cd FamiliarVsUnfamiliarColaughs-master
 $ python wav_splitter.py
