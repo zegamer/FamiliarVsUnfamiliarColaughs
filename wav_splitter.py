@@ -7,7 +7,7 @@ reader = read_csv('reader.csv')
 
 for idx, row in reader.iterrows():
       
-      input_folder = str(row["input_folder"])
+      input_folder = "Data/" + str(row["input_folder"])
       
       files = {
           "eaf" : input_folder + '/' + row['input_eaf'],
@@ -38,7 +38,8 @@ for idx, row in reader.iterrows():
       
       # Selective split the audio file based on co-laughs
       print("Writing to - " + target["op_folder"] + '/' + target["stu_part"])
-      audio = AudioSegment.from_wav(files["audio"])
+      
+      audio = AudioSegment.from_wav(files['audio'])
       num_simul = 0
       for i in range(len(t3_annots)):
             (start, end, laugh_type) = (t3_annots[i][0], t3_annots[i][1], t3_annots[i][2])

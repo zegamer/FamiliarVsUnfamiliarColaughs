@@ -1,32 +1,38 @@
 from sklearn.svm import SVC
-from sklearn.preprocessing import StandardScaler, RobustScaler, LabelEncoder
-from sklearn.model_selection import train_test_split
+from sklearn import svm
 from sklearn.metrics import accuracy_score
 import pandas as pd
+from data_acquisition import get_split_data
+import numpy as np
 
-data = pd.read_csv('output.csv')
+accuracy = []
+model_no = 0
 
-features = data.iloc[:,3:9].values
-feature_std_scaled = StandardScaler().fit_transform(features)
-# feature_robust_scaled = RobustScaler().fit_transform(features)
+for mode in [1,2,3]:
+      # for alternate in [True, False]:
+            
+      #       if alternate and mode == 3:
+      #             continue
+            
+      alternate = False
+      best_fit = pd.read_csv('{}best_fit_SVC_mode_{}.csv'.format('alt_' if alternate else '', mode))
+      importance = []
+      
+      for _ in range(5):
+            
+            alternate = False
+            features_train, features_test, familiarity_train, familiarity_test = get_split_data(mode, alternate)
 
-familiarity = data.iloc[:,9].values
-# familiarity = data.iloc[:,9:10].values
-encoder = LabelEncoder().fit(familiarity)
-familiarity = encoder.transform(familiarity)
+            # SV classifier
+            classifier_SV = SVC(
+                  kernel= best_fit['kernel'][model_no],
+                  gamma = best_fit['gamma'][model_no] if best_fit['gamma'][model_no] in ['auto', 'scale'] else float(best_fit['gamma'][model_no]),
+                  C = best_fit['penalty'][model_no],
+                  degree = 3 if pd.isna(best_fit['degree'][model_no]) else best_fit['degree'][model_no]
+            ).fit(features_train, familiarity_train)
+            
+            familiarity_predicted = classifier_SV.predict(features_test)
+            accuracy.append(accuracy_score(familiarity_test, familiarity_predicted))
 
-# Will be later used to decode
-# encoder.inverse_transform(predicted_vals)
-
-# Splitting dataset into test and train
-features_train, features_test, familiarity_train, familiarity_test = train_test_split(feature_std_scaled, familiarity, train_size = 0.8)
-# features_train, features_test, familiarity_train, familiarity_test = train_test_split(feature_robust_scaled, familiarity, train_size = 0.8)
-
-# SV classifier
-classifier_SV = SVC(kernel='sigmoid', gamma=100, C=10).fit(features_train, familiarity_train)
-familiarity_predicted = classifier_SV.predict(features_test)
-
-
-# Show accuracy
-# plot_confusion_matrix(classifier_SV, features_test, familiarity_test, labels = [0, 1])
-print("Accuracy is {}%".format(accuracy_score(familiarity_test, familiarity_predicted) * 100))
+      # Show accuracy
+      print("Min: {},\t Max: {},\t Avg: {}% for mode {}, alternate {}".format(min(accuracy) * 100 , max(accuracy) * 100, np.average(accuracy) * 100, mode, alternate))
